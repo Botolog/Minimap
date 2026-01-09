@@ -24,7 +24,13 @@ class NFSMinimap {
             rotateMap: true,
             speedUnit: 'kmh',
             mapTransitionDuration: 0.5,
-            rotationTransitionDuration: 0.8
+            rotationTransitionDuration: 0.8,
+            minimumMovementDelta: 5,
+            dynamicZoomEnabled: true,
+            dynamicZoomMinSpeed: 20,
+            dynamicZoomMaxSpeed: 100,
+            dynamicZoomMinZoom: 15,
+            dynamicZoomMaxZoom: 18
         };
 
         this.accentColors = {
@@ -247,6 +253,61 @@ class NFSMinimap {
             this.applySettings();
         });
 
+        const minimumMovementSlider = document.getElementById('minimum-movement-delta');
+        minimumMovementSlider.value = this.settings.minimumMovementDelta;
+        document.getElementById('minimum-movement-delta-value').textContent = this.settings.minimumMovementDelta + 'm';
+        minimumMovementSlider.addEventListener('input', (e) => {
+            this.settings.minimumMovementDelta = parseInt(e.target.value);
+            document.getElementById('minimum-movement-delta-value').textContent = this.settings.minimumMovementDelta + 'm';
+            this.saveSettings();
+        });
+
+        document.getElementById('dynamic-zoom-enabled').checked = this.settings.dynamicZoomEnabled;
+        document.getElementById('dynamic-zoom-enabled').addEventListener('change', (e) => {
+            this.settings.dynamicZoomEnabled = e.target.checked;
+            this.saveSettings();
+            document.getElementById('dynamic-zoom-settings').style.display = e.target.checked ? 'block' : 'none';
+        });
+
+        const dynamicZoomMinSpeedSlider = document.getElementById('dynamic-zoom-min-speed');
+        dynamicZoomMinSpeedSlider.value = this.settings.dynamicZoomMinSpeed;
+        document.getElementById('dynamic-zoom-min-speed-value').textContent = this.settings.dynamicZoomMinSpeed + ' km/h';
+        dynamicZoomMinSpeedSlider.addEventListener('input', (e) => {
+            this.settings.dynamicZoomMinSpeed = parseInt(e.target.value);
+            document.getElementById('dynamic-zoom-min-speed-value').textContent = this.settings.dynamicZoomMinSpeed + ' km/h';
+            this.saveSettings();
+        });
+
+        const dynamicZoomMaxSpeedSlider = document.getElementById('dynamic-zoom-max-speed');
+        dynamicZoomMaxSpeedSlider.value = this.settings.dynamicZoomMaxSpeed;
+        document.getElementById('dynamic-zoom-max-speed-value').textContent = this.settings.dynamicZoomMaxSpeed + ' km/h';
+        dynamicZoomMaxSpeedSlider.addEventListener('input', (e) => {
+            this.settings.dynamicZoomMaxSpeed = parseInt(e.target.value);
+            document.getElementById('dynamic-zoom-max-speed-value').textContent = this.settings.dynamicZoomMaxSpeed + ' km/h';
+            this.saveSettings();
+        });
+
+        const dynamicZoomMinZoomSlider = document.getElementById('dynamic-zoom-min-zoom');
+        dynamicZoomMinZoomSlider.value = this.settings.dynamicZoomMinZoom;
+        document.getElementById('dynamic-zoom-min-zoom-value').textContent = this.settings.dynamicZoomMinZoom;
+        dynamicZoomMinZoomSlider.addEventListener('input', (e) => {
+            this.settings.dynamicZoomMinZoom = parseInt(e.target.value);
+            document.getElementById('dynamic-zoom-min-zoom-value').textContent = this.settings.dynamicZoomMinZoom;
+            this.saveSettings();
+        });
+
+        const dynamicZoomMaxZoomSlider = document.getElementById('dynamic-zoom-max-zoom');
+        dynamicZoomMaxZoomSlider.value = this.settings.dynamicZoomMaxZoom;
+        document.getElementById('dynamic-zoom-max-zoom-value').textContent = this.settings.dynamicZoomMaxZoom;
+        dynamicZoomMaxZoomSlider.addEventListener('input', (e) => {
+            this.settings.dynamicZoomMaxZoom = parseInt(e.target.value);
+            document.getElementById('dynamic-zoom-max-zoom-value').textContent = this.settings.dynamicZoomMaxZoom;
+            this.saveSettings();
+        });
+
+        document.getElementById('dynamic-zoom-settings').style.display = 
+            this.settings.dynamicZoomEnabled ? 'block' : 'none';
+
         document.getElementById('cache-area-btn').addEventListener('click', () => {
             this.cacheCurrentArea();
         });
@@ -302,6 +363,15 @@ class NFSMinimap {
         const newPosition = [lat, lon];
 
         if (this.currentPosition) {
+            const distanceMoved = this.calculateDistance(
+                this.currentPosition[0], this.currentPosition[1],
+                newPosition[0], newPosition[1]
+            );
+
+            if (distanceMoved < this.settings.minimumMovementDelta) {
+                return;
+            }
+
             this.previousPosition = this.currentPosition;
             this.calculateSpeed(position);
             this.calculateHeading(this.previousPosition, newPosition);
@@ -309,7 +379,11 @@ class NFSMinimap {
 
         this.currentPosition = newPosition;
         
-        this.map.setView(this.currentPosition, this.settings.mapZoom, { 
+        const currentZoom = this.settings.dynamicZoomEnabled 
+            ? this.calculateDynamicZoom() 
+            : this.settings.mapZoom;
+        
+        this.map.setView(this.currentPosition, currentZoom, { 
             animate: true,
             duration: this.settings.mapTransitionDuration,
             easeLinearity: 0.1
@@ -338,6 +412,28 @@ class NFSMinimap {
         if (this.settings.showStreet) {
             this.updateStreetName(lat, lon);
         }
+    }
+
+    calculateDynamicZoom() {
+        const { dynamicZoomMinSpeed, dynamicZoomMaxSpeed, dynamicZoomMinZoom, dynamicZoomMaxZoom } = this.settings;
+        
+        let currentSpeed = this.speed;
+        if (this.settings.speedUnit === 'mph') {
+            currentSpeed = this.speed * 0.621371;
+        }
+        
+        if (currentSpeed <= dynamicZoomMinSpeed) {
+            return dynamicZoomMaxZoom;
+        }
+        if (currentSpeed >= dynamicZoomMaxSpeed) {
+            return dynamicZoomMinZoom;
+        }
+        
+        const speedRange = dynamicZoomMaxSpeed - dynamicZoomMinSpeed;
+        const zoomRange = dynamicZoomMaxZoom - dynamicZoomMinZoom;
+        const speedRatio = (currentSpeed - dynamicZoomMinSpeed) / speedRange;
+        
+        return Math.round(dynamicZoomMaxZoom - (speedRatio * zoomRange));
     }
 
     calculateSpeed(position) {

@@ -116,6 +116,53 @@
                         <p class="hint">Transition time for map rotation</p>
                     </div>
 
+                    <!-- Minimum Movement Delta -->
+                    <div class="setting-group">
+                        <h3>Minimum Movement</h3>
+                        <div class="slider-container">
+                            <input type="range" id="minimum-movement-delta" min="1" max="20" step="1" value="5">
+                            <span id="minimum-movement-delta-value">5m</span>
+                        </div>
+                        <p class="hint">Ignore GPS updates smaller than this distance</p>
+                    </div>
+
+                    <!-- Dynamic Zoom -->
+                    <div class="setting-group">
+                        <h3>Dynamic Zoom</h3>
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="dynamic-zoom-enabled" checked>
+                            <span class="toggle-slider"></span>
+                            <span class="toggle-label">Enable Dynamic Zoom</span>
+                        </label>
+                        <p class="hint">Automatically adjust zoom based on speed</p>
+                    </div>
+
+                    <!-- Dynamic Zoom Settings -->
+                    <div class="setting-group" id="dynamic-zoom-settings">
+                        <h3>Dynamic Zoom Range</h3>
+                        <label>Min Speed (closer zoom)</label>
+                        <div class="slider-container">
+                            <input type="range" id="dynamic-zoom-min-speed" min="0" max="50" step="5" value="20">
+                            <span id="dynamic-zoom-min-speed-value">20 km/h</span>
+                        </div>
+                        <label>Max Speed (farther zoom)</label>
+                        <div class="slider-container">
+                            <input type="range" id="dynamic-zoom-max-speed" min="50" max="200" step="10" value="100">
+                            <span id="dynamic-zoom-max-speed-value">100 km/h</span>
+                        </div>
+                        <label>Zoom at Min Speed</label>
+                        <div class="slider-container">
+                            <input type="range" id="dynamic-zoom-max-zoom" min="13" max="19" step="1" value="18">
+                            <span id="dynamic-zoom-max-zoom-value">18</span>
+                        </div>
+                        <label>Zoom at Max Speed</label>
+                        <div class="slider-container">
+                            <input type="range" id="dynamic-zoom-min-zoom" min="13" max="19" step="1" value="15">
+                            <span id="dynamic-zoom-min-zoom-value">15</span>
+                        </div>
+                        <p class="hint">Zoom closer when slow, farther when fast</p>
+                    </div>
+
                     <!-- Features Toggle -->
                     <div class="setting-group">
                         <h3>Features</h3>

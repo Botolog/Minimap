@@ -266,6 +266,14 @@ body {
     letter-spacing: 1px;
 }
 
+.setting-group label {
+    display: block;
+    color: #fff;
+    font-size: 14px;
+    margin-top: 15px;
+    margin-bottom: 5px;
+}
+
 .setting-group select {
     width: 100%;
     padding: 12px;
