@@ -95,13 +95,13 @@ body {
 
 #compass-indicator {
     position: absolute;
-    top: 15px;
+    top: 50%;
     left: 50%;
-    transform: translateX(-50%);
     width: 30px;
     height: 30px;
     pointer-events: none;
     z-index: 1001;
+    transform-origin: center center;
 }
 
 #compass-indicator::before {
@@ -109,7 +109,7 @@ body {
     position: absolute;
     top: 50%;
     left: 50%;
-    transform: translate(-50%, -50%);
+    transform: translate(-50%, -50%) rotate(0deg);
     font-size: 18px;
     font-weight: bold;
     color: var(--accent-color);

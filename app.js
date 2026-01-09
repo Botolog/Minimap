@@ -3,6 +3,7 @@ class NFSMinimap {
         this.map = null;
         this.currentPosition = null;
         this.currentHeading = 0;
+        this.previousHeading = 0;
         this.previousPosition = null;
         this.speed = 0;
         this.gpsWatchId = null;
@@ -74,6 +75,7 @@ class NFSMinimap {
     applyTransitionDurations() {
         const mapEl = document.getElementById('map');
         const northEl = document.getElementById('north-indicator');
+        const compassEl = document.getElementById('compass-indicator');
         
         if (mapEl) {
             mapEl.style.transition = `transform ${this.settings.rotationTransitionDuration}s cubic-bezier(0.25, 0.46, 0.45, 0.94)`;
@@ -81,6 +83,18 @@ class NFSMinimap {
         if (northEl) {
             northEl.style.transition = `transform ${this.settings.rotationTransitionDuration}s cubic-bezier(0.25, 0.46, 0.45, 0.94)`;
         }
+        if (compassEl) {
+            compassEl.style.transition = `transform ${this.settings.rotationTransitionDuration}s cubic-bezier(0.25, 0.46, 0.45, 0.94)`;
+        }
+    }
+
+    normalizeAngleForTransition(prevAngle, newAngle) {
+        let diff = newAngle - prevAngle;
+        
+        while (diff > 180) diff -= 360;
+        while (diff < -180) diff += 360;
+        
+        return prevAngle + diff;
     }
 
     initMap() {
@@ -311,8 +325,14 @@ class NFSMinimap {
         }
 
         if (this.settings.rotateMap) {
-            document.getElementById('map').style.transform = `rotate(${-this.currentHeading}deg)`;
-            document.getElementById('north-indicator').style.transform = `translateX(-50%) rotate(${this.currentHeading}deg)`;
+            const normalizedHeading = this.normalizeAngleForTransition(this.previousHeading, this.currentHeading);
+            document.getElementById('map').style.transform = `rotate(${-normalizedHeading}deg)`;
+            document.getElementById('north-indicator').style.transform = `translateX(-50%) rotate(${normalizedHeading}deg)`;
+            
+            const compassEl = document.getElementById('compass-indicator');
+            compassEl.style.transform = `rotate(${normalizedHeading}deg) translateY(-190px)`;
+            
+            this.previousHeading = normalizedHeading;
         }
 
         if (this.settings.showStreet) {
