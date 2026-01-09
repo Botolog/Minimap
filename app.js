@@ -10,6 +10,10 @@ class NFSMinimap {
         this.trailPoints = [];
         this.updateInterval = null;
         
+        this.smoothedPosition = null;
+        this.smoothedHeading = 0;
+        this.smoothingFactor = 0.3;
+        
         this.settings = {
             theme: 'heat',
             accentColor: 'cyan',
@@ -261,24 +265,54 @@ class NFSMinimap {
         }
 
         this.currentPosition = newPosition;
-        this.map.setView(this.currentPosition, this.settings.mapZoom, { animate: false });
+        
+        if (!this.smoothedPosition) {
+            this.smoothedPosition = newPosition;
+            this.smoothedHeading = this.currentHeading;
+        } else {
+            this.smoothedPosition = this.smoothCoordinates(this.smoothedPosition, newPosition);
+            this.smoothedHeading = this.smoothAngle(this.smoothedHeading, this.currentHeading);
+        }
+        
+        this.map.setView(this.smoothedPosition, this.settings.mapZoom, { 
+            animate: true,
+            duration: this.settings.gpsInterval * 0.8,
+            easeLinearity: 0.2
+        });
 
         if (this.settings.showTrail && this.trailPoints.length < 100) {
-            this.trailPoints.push(newPosition);
+            this.trailPoints.push(this.smoothedPosition);
             this.trailPolyline.setLatLngs(this.trailPoints);
         } else if (this.settings.showTrail) {
             this.trailPoints.shift();
-            this.trailPoints.push(newPosition);
+            this.trailPoints.push(this.smoothedPosition);
             this.trailPolyline.setLatLngs(this.trailPoints);
         }
 
         if (this.settings.rotateMap) {
-            document.getElementById('map').style.transform = `rotate(${-this.currentHeading}deg)`;
+            document.getElementById('map').style.transform = `rotate(${-this.smoothedHeading}deg)`;
         }
 
         if (this.settings.showStreet) {
             this.updateStreetName(lat, lon);
         }
+    }
+
+    smoothCoordinates(current, target) {
+        const factor = this.smoothingFactor;
+        return [
+            current[0] + (target[0] - current[0]) * factor,
+            current[1] + (target[1] - current[1]) * factor
+        ];
+    }
+
+    smoothAngle(current, target) {
+        let diff = target - current;
+        
+        if (diff > 180) diff -= 360;
+        if (diff < -180) diff += 360;
+        
+        return current + diff * this.smoothingFactor;
     }
 
     calculateSpeed(position) {

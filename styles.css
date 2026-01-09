@@ -51,11 +51,16 @@ body {
     overflow: hidden;
     position: relative;
     background: #0a0a0a;
+    transition: transform 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
 }
 
 .leaflet-container {
     background: #0a0a0a !important;
     border-radius: 50%;
+}
+
+.leaflet-map-pane {
+    transition: transform 0.2s ease-out;
 }
 
 .leaflet-tile-pane {
