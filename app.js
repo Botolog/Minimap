@@ -10,10 +10,6 @@ class NFSMinimap {
         this.trailPoints = [];
         this.updateInterval = null;
         
-        this.smoothedPosition = null;
-        this.smoothedHeading = 0;
-        this.movementSmoothness = 0.4;
-        this.rotationSmoothness = 0.15;
         
         this.settings = {
             theme: 'heat',
@@ -26,8 +22,8 @@ class NFSMinimap {
             showTrail: true,
             rotateMap: true,
             speedUnit: 'kmh',
-            movementSmoothness: 0.4,
-            rotationSmoothness: 0.15
+            mapTransitionDuration: 0.5,
+            rotationTransitionDuration: 0.8
         };
 
         this.accentColors = {
@@ -52,8 +48,7 @@ class NFSMinimap {
         if (saved) {
             this.settings = { ...this.settings, ...JSON.parse(saved) };
         }
-        this.movementSmoothness = this.settings.movementSmoothness;
-        this.rotationSmoothness = this.settings.rotationSmoothness;
+        this.applyTransitionDurations();
         this.applySettings();
     }
 
@@ -74,6 +69,18 @@ class NFSMinimap {
         }
 
         document.getElementById('speed-unit').textContent = this.settings.speedUnit.toUpperCase();
+    }
+
+    applyTransitionDurations() {
+        const mapEl = document.getElementById('map');
+        const northEl = document.getElementById('north-indicator');
+        
+        if (mapEl) {
+            mapEl.style.transition = `transform ${this.settings.rotationTransitionDuration}s cubic-bezier(0.25, 0.46, 0.45, 0.94)`;
+        }
+        if (northEl) {
+            northEl.style.transition = `transform ${this.settings.rotationTransitionDuration}s cubic-bezier(0.25, 0.46, 0.45, 0.94)`;
+        }
     }
 
     initMap() {
@@ -159,24 +166,24 @@ class NFSMinimap {
             }
         });
 
-        const movementSmoothnessSlider = document.getElementById('movement-smoothness');
-        movementSmoothnessSlider.value = this.settings.movementSmoothness;
-        document.getElementById('movement-smoothness-value').textContent = this.settings.movementSmoothness.toFixed(2);
-        movementSmoothnessSlider.addEventListener('input', (e) => {
-            this.settings.movementSmoothness = parseFloat(e.target.value);
-            this.movementSmoothness = this.settings.movementSmoothness;
-            document.getElementById('movement-smoothness-value').textContent = this.settings.movementSmoothness.toFixed(2);
+        const mapTransitionSlider = document.getElementById('movement-smoothness');
+        mapTransitionSlider.value = this.settings.mapTransitionDuration;
+        document.getElementById('movement-smoothness-value').textContent = this.settings.mapTransitionDuration.toFixed(2) + 's';
+        mapTransitionSlider.addEventListener('input', (e) => {
+            this.settings.mapTransitionDuration = parseFloat(e.target.value);
+            document.getElementById('movement-smoothness-value').textContent = this.settings.mapTransitionDuration.toFixed(2) + 's';
             this.saveSettings();
+            this.applyTransitionDurations();
         });
 
-        const rotationSmoothnessSlider = document.getElementById('rotation-smoothness');
-        rotationSmoothnessSlider.value = this.settings.rotationSmoothness;
-        document.getElementById('rotation-smoothness-value').textContent = this.settings.rotationSmoothness.toFixed(2);
-        rotationSmoothnessSlider.addEventListener('input', (e) => {
-            this.settings.rotationSmoothness = parseFloat(e.target.value);
-            this.rotationSmoothness = this.settings.rotationSmoothness;
-            document.getElementById('rotation-smoothness-value').textContent = this.settings.rotationSmoothness.toFixed(2);
+        const rotationTransitionSlider = document.getElementById('rotation-smoothness');
+        rotationTransitionSlider.value = this.settings.rotationTransitionDuration;
+        document.getElementById('rotation-smoothness-value').textContent = this.settings.rotationTransitionDuration.toFixed(2) + 's';
+        rotationTransitionSlider.addEventListener('input', (e) => {
+            this.settings.rotationTransitionDuration = parseFloat(e.target.value);
+            document.getElementById('rotation-smoothness-value').textContent = this.settings.rotationTransitionDuration.toFixed(2) + 's';
             this.saveSettings();
+            this.applyTransitionDurations();
         });
 
         document.getElementById('show-speed').checked = this.settings.showSpeed;
@@ -288,54 +295,29 @@ class NFSMinimap {
 
         this.currentPosition = newPosition;
         
-        if (!this.smoothedPosition) {
-            this.smoothedPosition = newPosition;
-            this.smoothedHeading = this.currentHeading;
-        } else {
-            this.smoothedPosition = this.smoothCoordinates(this.smoothedPosition, newPosition);
-            this.smoothedHeading = this.smoothAngle(this.smoothedHeading, this.currentHeading);
-        }
-        
-        this.map.setView(this.smoothedPosition, this.settings.mapZoom, { 
+        this.map.setView(this.currentPosition, this.settings.mapZoom, { 
             animate: true,
-            duration: this.settings.gpsInterval * 0.8,
-            easeLinearity: 0.2
+            duration: this.settings.mapTransitionDuration,
+            easeLinearity: 0.1
         });
 
         if (this.settings.showTrail && this.trailPoints.length < 100) {
-            this.trailPoints.push(this.smoothedPosition);
+            this.trailPoints.push(this.currentPosition);
             this.trailPolyline.setLatLngs(this.trailPoints);
         } else if (this.settings.showTrail) {
             this.trailPoints.shift();
-            this.trailPoints.push(this.smoothedPosition);
+            this.trailPoints.push(this.currentPosition);
             this.trailPolyline.setLatLngs(this.trailPoints);
         }
 
         if (this.settings.rotateMap) {
-            document.getElementById('map').style.transform = `rotate(${-this.smoothedHeading}deg)`;
-            document.getElementById('north-indicator').style.transform = `rotate(${this.smoothedHeading}deg)`;
+            document.getElementById('map').style.transform = `rotate(${-this.currentHeading}deg)`;
+            document.getElementById('north-indicator').style.transform = `translateX(-50%) rotate(${this.currentHeading}deg)`;
         }
 
         if (this.settings.showStreet) {
             this.updateStreetName(lat, lon);
         }
-    }
-
-    smoothCoordinates(current, target) {
-        const factor = this.movementSmoothness;
-        return [
-            current[0] + (target[0] - current[0]) * factor,
-            current[1] + (target[1] - current[1]) * factor
-        ];
-    }
-
-    smoothAngle(current, target) {
-        let diff = target - current;
-        
-        if (diff > 180) diff -= 360;
-        if (diff < -180) diff += 360;
-        
-        return current + diff * this.rotationSmoothness;
     }
 
     calculateSpeed(position) {

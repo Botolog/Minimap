@@ -40,7 +40,6 @@ body {
     z-index: 1002;
     pointer-events: none;
     filter: drop-shadow(0 0 8px var(--accent-color));
-    transition: transform 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
 }
 
 #north-indicator svg {
@@ -67,7 +66,6 @@ body {
     overflow: hidden;
     position: relative;
     background: #0a0a0a;
-    transition: transform 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94);
 }
 
 .leaflet-container {
