@@ -31,6 +31,22 @@ body {
     max-height: 90vmin;
 }
 
+#north-indicator {
+    position: absolute;
+    top: -20px;
+    left: 50%;
+    transform: translateX(-50%);
+    color: var(--accent-color);
+    z-index: 1002;
+    pointer-events: none;
+    filter: drop-shadow(0 0 8px var(--accent-color));
+    transition: transform 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+#north-indicator svg {
+    display: block;
+}
+
 #minimap-border {
     position: relative;
     width: 100%;
@@ -51,7 +67,7 @@ body {
     overflow: hidden;
     position: relative;
     background: #0a0a0a;
-    transition: transform 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    transition: transform 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94);
 }
 
 .leaflet-container {

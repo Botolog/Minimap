@@ -12,19 +12,22 @@ class NFSMinimap {
         
         this.smoothedPosition = null;
         this.smoothedHeading = 0;
-        this.smoothingFactor = 0.3;
+        this.movementSmoothness = 0.4;
+        this.rotationSmoothness = 0.15;
         
         this.settings = {
             theme: 'heat',
             accentColor: 'cyan',
-            gpsInterval: 20.1,
+            gpsInterval: 0.1,
             mapZoom: 17,
             showSpeed: true,
             showStreet: true,
             showCompass: true,
             showTrail: true,
             rotateMap: true,
-            speedUnit: 'kmh'
+            speedUnit: 'kmh',
+            movementSmoothness: 0.4,
+            rotationSmoothness: 0.15
         };
 
         this.accentColors = {
@@ -49,6 +52,8 @@ class NFSMinimap {
         if (saved) {
             this.settings = { ...this.settings, ...JSON.parse(saved) };
         }
+        this.movementSmoothness = this.settings.movementSmoothness;
+        this.rotationSmoothness = this.settings.rotationSmoothness;
         this.applySettings();
     }
 
@@ -154,6 +159,26 @@ class NFSMinimap {
             }
         });
 
+        const movementSmoothnessSlider = document.getElementById('movement-smoothness');
+        movementSmoothnessSlider.value = this.settings.movementSmoothness;
+        document.getElementById('movement-smoothness-value').textContent = this.settings.movementSmoothness.toFixed(2);
+        movementSmoothnessSlider.addEventListener('input', (e) => {
+            this.settings.movementSmoothness = parseFloat(e.target.value);
+            this.movementSmoothness = this.settings.movementSmoothness;
+            document.getElementById('movement-smoothness-value').textContent = this.settings.movementSmoothness.toFixed(2);
+            this.saveSettings();
+        });
+
+        const rotationSmoothnessSlider = document.getElementById('rotation-smoothness');
+        rotationSmoothnessSlider.value = this.settings.rotationSmoothness;
+        document.getElementById('rotation-smoothness-value').textContent = this.settings.rotationSmoothness.toFixed(2);
+        rotationSmoothnessSlider.addEventListener('input', (e) => {
+            this.settings.rotationSmoothness = parseFloat(e.target.value);
+            this.rotationSmoothness = this.settings.rotationSmoothness;
+            document.getElementById('rotation-smoothness-value').textContent = this.settings.rotationSmoothness.toFixed(2);
+            this.saveSettings();
+        });
+
         document.getElementById('show-speed').checked = this.settings.showSpeed;
         document.getElementById('show-speed').addEventListener('change', (e) => {
             this.settings.showSpeed = e.target.checked;
@@ -192,9 +217,6 @@ class NFSMinimap {
         document.getElementById('rotate-map').addEventListener('change', (e) => {
             this.settings.rotateMap = e.target.checked;
             this.saveSettings();
-            if (!e.target.checked) {
-                document.getElementById('map').style.transform = 'rotate(0deg)';
-            }
         });
 
         document.getElementById('speed-unit').value = this.settings.speedUnit;
@@ -291,6 +313,7 @@ class NFSMinimap {
 
         if (this.settings.rotateMap) {
             document.getElementById('map').style.transform = `rotate(${-this.smoothedHeading}deg)`;
+            document.getElementById('north-indicator').style.transform = `rotate(${this.smoothedHeading}deg)`;
         }
 
         if (this.settings.showStreet) {
@@ -299,7 +322,7 @@ class NFSMinimap {
     }
 
     smoothCoordinates(current, target) {
-        const factor = this.smoothingFactor;
+        const factor = this.movementSmoothness;
         return [
             current[0] + (target[0] - current[0]) * factor,
             current[1] + (target[1] - current[1]) * factor
@@ -312,7 +335,7 @@ class NFSMinimap {
         if (diff > 180) diff -= 360;
         if (diff < -180) diff += 360;
         
-        return current + diff * this.smoothingFactor;
+        return current + diff * this.rotationSmoothness;
     }
 
     calculateSpeed(position) {
