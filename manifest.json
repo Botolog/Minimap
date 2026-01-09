@@ -1,0 +1,30 @@
+{
+  "name": "NFS Minimap",
+  "short_name": "NFS Map",
+  "description": "Need for Speed style GPS minimap for your car",
+  "start_url": "./index.html",
+  "display": "fullscreen",
+  "background_color": "#000000",
+  "theme_color": "#00ffff",
+  "orientation": "landscape",
+  "icons": [
+    {
+      "src": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAACXBIWXMAAAsTAAALEwEAmpwYAAABjklEQVR4nO2XzUrDQBSFv6ZaqVYRxY07N4K4c+HS9/EFfABfwZ0gCO58ABeuXLhQwYWIilqt+FNt0yYzEqGUJjOTTBqhPXBgmOR+59zMTW4gIyMjIyPjPwNYAraAE+AaGACj6BoAt8AhsAksRveEVGAZqAOPwBC/egQawEp0jy8FaoaH21QFSjEOg8EVwTUAngK8I2C5CD6hErBTAJ9QLYDPG+DzBvg8Jt9ZCLwE7Gbg88b4vBk+jwW+GgpfNsTnzfB5c3zeAp+3xOet8Xlr4ONOAa8kQdctLhZJVCQT31hcfKsi3wnwDW1BUyRbSeCbiPmYSU0S31TM50zq0vhmEj5vip9LTQrfXMLnzfBzaUnhW0j4vAW+RVpS+JYSPm+Jb5WWFL6ShM9b4VunJYVvLeHzVvj2aUnh20v4vBW+Q1pS+A4SPm+F75SWD76zhM/DnG+pSuAD/uX7ArYN8G3gKzbfGdgwwLeBs9h852DdAN8auIjN90Ws+aM33waV72s+bpu1mZGRkZGRwWfxDtD8qXmyMVzAAAAAAElFTkSuQmCC",
+      "sizes": "32x32",
+      "type": "image/png"
+    },
+    {
+      "src": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAACXBIWXMAAAsTAAALEwEAmpwYAAABjklEQVR4nO2XzUrDQBSFv6ZaqVYRxY07N4K4c+HS9/EFfABfwZ0gCO58ABeuXLhQwYWIilqt+FNt0yYzEqGUJjOTTBqhPXBgmOR+59zMTW4gIyMjIyPjPwNYAraAE+AaGACj6BoAt8AhsAksRveEVGAZqAOPwBC/egQawEp0jy8FaoaH21QFSjEOg8EVwTUAngK8I2C5CD6hErBTAJ9QLYDPG+DzBvg8Jt9ZCLwE7Gbg88b4vBk+jwW+GgpfNsTnzfB5c3zeAp+3xOet8Xlr4ONOAa8kQdctLhZJVCQT31hcfKsi3wnwDW1BUyRbSeCbiPmYSU0S31TM50zq0vhmEj5vip9LTQrfXMLnzfBzaUnhW0j4vAW+RVpS+JYSPm+Jb5WWFL6ShM9b4VunJYVvLeHzVvj2aUnh20v4vBW+Q1pS+A4SPm+F75SWD76zhM/DnG+pSuAD/uX7ArYN8G3gKzbfGdgwwLeBs9h852DdAN8auIjN90Ws+aM33waV72s+bpu1mZGRkZGRwWfxDtD8qXmyMVzAAAAAAElFTkSuQmCC",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAACXBIWXMAAAsTAAALEwEAmpwYAAABjklEQVR4nO2XzUrDQBSFv6ZaqVYRxY07N4K4c+HS9/EFfABfwZ0gCO58ABeuXLhQwYWIilqt+FNt0yYzEqGUJjOTTBqhPXBgmOR+59zMTW4gIyMjIyPjPwNYAraAE+AaGACj6BoAt8AhsAksRveEVGAZqAOPwBC/egQawEp0jy8FaoaH21QFSjEOg8EVwTUAngK8I2C5CD6hErBTAJ9QLYDPG+DzBvg8Jt9ZCLwE7Gbg88b4vBk+jwW+GgpfNsTnzfB5c3zeAp+3xOet8Xlr4ONOAa8kQdctLhZJVCQT31hcfKsi3wnwDW1BUyRbSeCbiPmYSU0S31TM50zq0vhmEj5vip9LTQrfXMLnzfBzaUnhW0j4vAW+RVpS+JYSPm+Jb5WWFL6ShM9b4VunJYVvLeHzVvj2aUnh20v4vBW+Q1pS+A4SPm+F75SWD76zhM/DnG+pSuAD/uX7ArYN8G3gKzbfGdgwwLeBs9h852DdAN8auIjN90Ws+aM33waV72s+bpu1mZGRkZGRwWfxDtD8qXmyMVzAAAAAAElFTkSuQmCC",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "categories": ["navigation", "utilities"],
+  "screenshots": []
+}
